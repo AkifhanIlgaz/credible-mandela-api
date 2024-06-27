@@ -18,6 +18,8 @@ import (
 func main() {
 	godotenv.Load()
 
+	fmt.Println(os.Getenv("MONGO_URI"))
+
 	ctx := context.TODO()
 
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
