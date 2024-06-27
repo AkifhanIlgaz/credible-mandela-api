@@ -62,7 +62,7 @@ func main() {
 
 func setCors(server *gin.Engine) {
 	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowOrigins = []string{"http://localhost:3000"}
+	corsConfig.AllowOrigins = []string{"https://www.crediblemandela.xyz"}
 	corsConfig.AllowHeaders = []string{"*"}
 	corsConfig.AllowCredentials = true
 
