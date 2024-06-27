@@ -56,7 +56,7 @@ func main() {
 	router.GET("/ad", adController.GetAd)
 	router.GET("/ads", adController.GetAllAds)
 
-	err = server.Run(":8000")
+	err = server.Run(":" + os.Getenv("PORT"))
 	if err != nil {
 		log.Fatal(err)
 	}
