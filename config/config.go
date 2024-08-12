@@ -8,11 +8,16 @@ import (
 
 type Config struct {
 	MongoURI string `mapstructure:"MONGO_URI"`
+	Port     int    `mapstructure:"PORT"`
 }
 
-func (c Config) Validate() error {
+func (c *Config) Validate() error {
 	if c.MongoURI == "" {
 		return fmt.Errorf("MONGO_URI is required")
+	}
+
+	if c.Port == 0 {
+		c.Port = 8000
 	}
 
 	return nil

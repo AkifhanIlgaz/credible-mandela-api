@@ -4,30 +4,30 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 
+	cfg "github.com/AkifhanIlgaz/credible-mandela-api/config"
 	"github.com/AkifhanIlgaz/credible-mandela-api/controllers"
+	"github.com/AkifhanIlgaz/credible-mandela-api/routers"
+	"github.com/AkifhanIlgaz/credible-mandela-api/services"
+	"github.com/AkifhanIlgaz/credible-mandela-api/utils/constants"
+	"github.com/AkifhanIlgaz/credible-mandela-api/utils/database"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
 	godotenv.Load()
-
-	fmt.Println(os.Getenv("MONGO_URI"))
+	config, err := cfg.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	ctx := context.TODO()
 
-	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	opts := options.Client().ApplyURI(os.Getenv("MONGO_URI")).SetServerAPIOptions(serverAPI)
-
-	client, err := mongo.Connect(ctx, opts)
+	client, err := database.Connect(ctx, config)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	defer func() {
@@ -36,27 +36,26 @@ func main() {
 		}
 	}()
 
-	// Send a ping to confirm a successful connection
-	if err := client.Database("admin").RunCommand(ctx, bson.D{{"ping", 1}}).Err(); err != nil {
-		panic(err)
-	}
-	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
+	db := client.Database(constants.DatabaseName)
 
-	adController, err := controllers.NewAdController(ctx, client.Database("credible-mandela"))
-	if err != nil {
-		panic(err)
-	}
+	adService := services.NewAdService(ctx, db)
+	authService := services.NewAuthService(ctx, db)
+
+	adController := controllers.NewAdController(adService)
+	authController := controllers.NewAuthController(authService)
+
+	adRouter := routers.NewAdRouter(adController)
+	authRouter := routers.NewAuthRouter(authController)
 
 	server := gin.Default()
 	setCors(server)
 
 	router := server.Group("/api")
 
-	router.POST("/ad", adController.CreateAd)
-	router.GET("/ad", adController.GetAd)
-	router.GET("/ads", adController.GetAllAds)
+	adRouter.Setup(router)
+	authRouter.Setup(router)
 
-	err = server.Run(":" + os.Getenv("PORT"))
+	err = server.Run(fmt.Sprintf(":%v", config.Port))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,7 +63,7 @@ func main() {
 
 func setCors(server *gin.Engine) {
 	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowOrigins = []string{"https://www.crediblemandela.xyz"}
+	corsConfig.AllowOrigins = []string{"http://localhost:3000"}
 	corsConfig.AllowHeaders = []string{"*"}
 	corsConfig.AllowCredentials = true
 
