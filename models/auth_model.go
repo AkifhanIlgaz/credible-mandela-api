@@ -27,7 +27,5 @@ func (rf RegisterFormWithSignature) Validate() error {
 		return fmt.Errorf("%s is not valid ethereum address", rf.Address)
 	}
 
-	
-
 	return nil
 }
