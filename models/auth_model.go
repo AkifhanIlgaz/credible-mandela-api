@@ -1,8 +1,10 @@
 package models
 
 import (
+	"encoding/json"
 	"fmt"
 
+	"github.com/AkifhanIlgaz/credible-mandela-api/utils/crypto"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -20,11 +22,22 @@ type RegisterFormWithSignature struct {
 
 func (rf RegisterFormWithSignature) Validate() error {
 	if rf.Password != rf.ConfirmPassword {
-		return fmt.Errorf("password does not match")
+		return fmt.Errorf("validate register form: password does not match")
 	}
 
 	if !common.IsHexAddress(rf.Address) {
-		return fmt.Errorf("%s is not valid ethereum address", rf.Address)
+		return fmt.Errorf("validate register form: %s is not valid ethereum address", rf.Address)
+	}
+
+	msg, err := json.Marshal(&rf.RegisterForm)
+	if err != nil {
+		return fmt.Errorf("validate register form: %w", err)
+	}
+
+	err = crypto.VerifySignature(msg, rf.Signature, rf.Address)
+	if err != nil {
+		
+		return fmt.Errorf("validate register form: %w", err)
 	}
 
 	return nil
