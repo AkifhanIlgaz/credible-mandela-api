@@ -20,9 +20,13 @@ func (controller AuthController) Login(ctx *gin.Context) {
 }
 
 func (controller AuthController) Register(ctx *gin.Context) {
-
+	
 }
 
 func (controller AuthController) Logout(ctx *gin.Context) {
+
+}
+
+func (controller AuthController) Refresh(ctx *gin.Context) {
 
 }

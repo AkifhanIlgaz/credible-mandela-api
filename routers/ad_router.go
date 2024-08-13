@@ -2,9 +2,10 @@ package routers
 
 import (
 	"github.com/AkifhanIlgaz/credible-mandela-api/controllers"
-	"github.com/AkifhanIlgaz/credible-mandela-api/utils/constants"
 	"github.com/gin-gonic/gin"
 )
+
+const AdsPath = "/ads"
 
 type AdRouter struct {
 	adController controllers.AdController
@@ -17,7 +18,7 @@ func NewAdRouter(adController controllers.AdController) AdRouter {
 }
 
 func (r AdRouter) Setup(rg *gin.RouterGroup) {
-	router := rg.Group(constants.AdsPath)
+	router := rg.Group(AdsPath)
 
 	router.GET("/", r.adController.GetAllAds)                 // Get all ads
 	router.POST("/", r.adController.PublishAd)                // Publish an ad

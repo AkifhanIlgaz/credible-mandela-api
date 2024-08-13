@@ -2,8 +2,15 @@ package routers
 
 import (
 	"github.com/AkifhanIlgaz/credible-mandela-api/controllers"
-	"github.com/AkifhanIlgaz/credible-mandela-api/utils/constants"
 	"github.com/gin-gonic/gin"
+)
+
+const (
+	AuthPath     string = "/auth"
+	LoginPath    string = "/login"
+	RegisterPath string = "/register"
+	LogoutPath   string = "/logout"
+	RefreshPath  string = "/refresh"
 )
 
 type AuthRouter struct {
@@ -17,9 +24,10 @@ func NewAuthRouter(authController controllers.AuthController) AuthRouter {
 }
 
 func (r AuthRouter) Setup(rg *gin.RouterGroup) {
-	router := rg.Group(constants.AuthPath)
+	router := rg.Group(AuthPath)
 
-	router.POST("/login", r.authController.Login)
-	router.POST("/register", r.authController.Register)
-	router.POST("/logout", r.authController.Logout)
+	router.POST(LoginPath, r.authController.Login)
+	router.POST(RegisterPath, r.authController.Register)
+	router.POST(LogoutPath, r.authController.Logout)
+	router.POST(RefreshPath, r.authController.Refresh)
 }
