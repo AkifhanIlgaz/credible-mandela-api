@@ -9,9 +9,9 @@ import (
 )
 
 type RegisterForm struct {
-	Username        string `json:"username" binding:"required"`
-	Password        string `json:"password" binding:"required"`
-	ConfirmPassword string `json:"confirmPassword" binding:"required"`
+	Username        string `json:"username" binding:"required,min=1"`
+	Password        string `json:"password" binding:"required,min=6"`
+	ConfirmPassword string `json:"confirmPassword" binding:"required,min=6"`
 	Address         string `json:"address" binding:"required"`
 }
 
@@ -36,9 +36,23 @@ func (rf RegisterFormWithSignature) Validate() error {
 
 	err = crypto.VerifySignature(msg, rf.Signature, rf.Address)
 	if err != nil {
-		
+
 		return fmt.Errorf("validate register form: %w", err)
 	}
 
 	return nil
+}
+
+func (rf RegisterForm) ToUser() (User, error) {
+	passwordHash, err := crypto.HashPassword(rf.Password)
+	if err != nil {
+		return User{}, fmt.Errorf("convert register form to user: %w", err)
+	}
+
+	return User{
+		Username:     rf.Username,
+		PasswordHash: passwordHash,
+		Address:      rf.Address,
+		Roles:        "",
+	}, nil
 }

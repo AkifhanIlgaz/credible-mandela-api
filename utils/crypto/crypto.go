@@ -6,6 +6,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func VerifySignature(message []byte, signature, from string) error {
@@ -35,4 +36,17 @@ func VerifySignature(message []byte, signature, from string) error {
 	}
 
 	return nil
+}
+
+func HashPassword(password string) (string, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", fmt.Errorf("could not hash password: %w", err)
+	}
+
+	return string(hashedPassword), nil
+}
+
+func VerifyPassword(hashedPassword, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }

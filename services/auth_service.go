@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 
+	"github.com/AkifhanIlgaz/credible-mandela-api/models"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -18,4 +19,8 @@ func NewAuthService(ctx context.Context, db *mongo.Database) AuthService {
 		ctx: ctx,
 		db:  db,
 	}
+}
+
+func (service AuthService) CreateUser(user models.User) (models.User, error) {
+
 }

@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/AkifhanIlgaz/credible-mandela-api/models"
 	"github.com/AkifhanIlgaz/credible-mandela-api/services"
+	"github.com/AkifhanIlgaz/credible-mandela-api/utils/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,13 +28,21 @@ func (controller AuthController) Register(ctx *gin.Context) {
 	var form models.RegisterFormWithSignature
 
 	if err := ctx.ShouldBindJSON(&form); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Println(err.Error())
+		response.Error(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err := form.Validate(); err != nil {
-		fmt.Println(err)
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Println(err.Error())
+		response.Error(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	user, err := form.ToUser()
+	if err != nil {
+		log.Println(err.Error())
+		response.Error(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
