@@ -3,30 +3,17 @@ package config
 import (
 	"fmt"
 
-	"github.com/AkifhanIlgaz/credible-mandela-api/utils/constants"
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	MongoURI     string `mapstructure:"MONGO_URI"`
-	Port         int    `mapstructure:"PORT"`
-	MinCredScore int    `mapstructure:"MIN_CRED_SCORE"`
+	MongoURI string `mapstructure:"MONGO_URI"`
 }
 
 func (c *Config) Validate() error {
 	if c.MongoURI == "" {
 		return fmt.Errorf("MONGO_URI is required")
 	}
-
-	if c.Port == 0 {
-		c.Port = constants.DefaultPort
-	}
-
-	if c.MinCredScore == 0 {
-		c.MinCredScore = constants.DefaultMinCredScore
-	}
-
-	c.MinCredScore *= 10
 
 	return nil
 }

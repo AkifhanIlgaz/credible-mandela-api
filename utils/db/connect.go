@@ -1,11 +1,10 @@
-package database
+package db
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/AkifhanIlgaz/credible-mandela-api/config"
-	"github.com/AkifhanIlgaz/credible-mandela-api/utils/constants"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -20,7 +19,7 @@ func Connect(ctx context.Context, config config.Config) (*mongo.Client, error) {
 		return nil, fmt.Errorf("failed to connect to MongoDB: %w", err)
 	}
 
-	if err := client.Database(constants.DatabaseName).RunCommand(ctx, bson.M{"ping": 1}).Err(); err != nil {
+	if err := client.Database(DatabaseName).RunCommand(ctx, bson.M{"ping": 1}).Err(); err != nil {
 		return nil, fmt.Errorf("failed to ping MongoDB: %w", err)
 	}
 	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")

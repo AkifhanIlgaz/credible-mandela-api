@@ -13,11 +13,11 @@ var (
 	}
 )
 
-func Success(ctx *gin.Context, statusCode int, data gin.H) {
+func WithSuccess(ctx *gin.Context, statusCode int, data gin.H) {
 	ctx.JSON(statusCode, mergeResponseData(successResponseBase, data))
 }
 
-func Error(ctx *gin.Context, statusCode int, message string) {
+func WithError(ctx *gin.Context, statusCode int, message string) {
 	ctx.AbortWithStatusJSON(statusCode, gin.H{
 		"status":  StatusError,
 		"message": message,

@@ -29,24 +29,35 @@ func (controller AuthController) Register(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&form); err != nil {
 		log.Println(err.Error())
-		response.Error(ctx, http.StatusBadRequest, err.Error())
+		response.WithError(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err := form.Validate(); err != nil {
 		log.Println(err.Error())
-		response.Error(ctx, http.StatusBadRequest, err.Error())
+		response.WithError(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	user, err := form.ToUser()
 	if err != nil {
 		log.Println(err.Error())
-		response.Error(ctx, http.StatusInternalServerError, err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	// TODO: Create user on DB
+	// TODO: Check if given address has enough cred
+
+	userId, err := controller.authService.CreateUser(user)
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusConflict, err.Error())
+		return
+	}
+
+	response.WithSuccess(ctx, http.StatusOK, gin.H{
+		"userId": userId.Hex(),
+	})
 }
 
 func (controller AuthController) Logout(ctx *gin.Context) {

@@ -10,7 +10,7 @@ import (
 	"github.com/AkifhanIlgaz/credible-mandela-api/routers"
 	"github.com/AkifhanIlgaz/credible-mandela-api/services"
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/constants"
-	"github.com/AkifhanIlgaz/credible-mandela-api/utils/database"
+	"github.com/AkifhanIlgaz/credible-mandela-api/utils/db"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -25,7 +25,7 @@ func main() {
 
 	ctx := context.TODO()
 
-	client, err := database.Connect(ctx, config)
+	client, err := db.Connect(ctx, config)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,7 +36,7 @@ func main() {
 		}
 	}()
 
-	db := client.Database(constants.DatabaseName)
+	db := client.Database(db.DatabaseName)
 
 	adService := services.NewAdService(ctx, db)
 	authService := services.NewAuthService(ctx, db)
@@ -55,7 +55,7 @@ func main() {
 	adRouter.Setup(router)
 	authRouter.Setup(router)
 
-	err = server.Run(fmt.Sprintf(":%v", config.Port))
+	err = server.Run(fmt.Sprintf(":%v", constants.Port))
 	if err != nil {
 		log.Fatal(err)
 	}
