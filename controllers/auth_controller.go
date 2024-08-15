@@ -50,7 +50,6 @@ func (controller AuthController) Register(ctx *gin.Context) {
 		return
 	}
 
-	// TODO: Check if given address has enough cred
 	cred, err := controller.mandeClient.GetCredOfUser(user.Address)
 	if err != nil {
 		log.Println(err.Error())
@@ -60,7 +59,6 @@ func (controller AuthController) Register(ctx *gin.Context) {
 
 	if hasEnoughCred := mande.IsEnoughCredToRegister(cred); !hasEnoughCred {
 		log.Printf("%v does not have enough cred to register", user.Address)
-		// TODO: Create error package and constants
 		response.WithError(ctx, http.StatusInternalServerError, fmt.Sprintf("%v does not have enough cred to register", user.Address))
 		return
 	}

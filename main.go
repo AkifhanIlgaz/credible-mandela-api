@@ -11,6 +11,7 @@ import (
 	"github.com/AkifhanIlgaz/credible-mandela-api/services"
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/constants"
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/db"
+	"github.com/AkifhanIlgaz/credible-mandela-api/utils/mande"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -38,11 +39,13 @@ func main() {
 
 	db := client.Database(db.DatabaseName)
 
+	mandeClient := mande.NewClient()
+
 	adService := services.NewAdService(ctx, db)
 	authService := services.NewAuthService(ctx, db)
 
 	adController := controllers.NewAdController(adService)
-	authController := controllers.NewAuthController(authService)
+	authController := controllers.NewAuthController(authService, mandeClient)
 
 	adRouter := routers.NewAdRouter(adController)
 	authRouter := routers.NewAuthRouter(authController)
