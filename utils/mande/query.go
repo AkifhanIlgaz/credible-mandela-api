@@ -19,15 +19,15 @@ query CredQuery($address: ID!) {
 `
 
 type user struct {
-	CredScoreAccrued string `json:"credScoreAccrued"`
+	CredScoreAccrued string `json:"credScoreAccrued,omitempty"`
 }
 
 type data struct {
-	User user `json:"user"`
+	User user `json:"user,omitempty"`
 }
 
 type credQueryResponse struct {
-	Data data `json:"data"`
+	Data data `json:"data,omitempty"`
 }
 
 func generateCredQueryRequest(address string) queryRequest {

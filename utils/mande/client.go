@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/constants"
 )
@@ -25,7 +26,7 @@ func NewClient() Client {
 	}
 }
 
-func (mc Client) GetCredScoreOfUser(address string) (int, error) {
+func (mc Client) GetCredScoreOfUser(address string) (float64, error) {
 	credQueryRequest := generateCredQueryRequest(address)
 	reqBody, err := json.Marshal(&credQueryRequest)
 	if err != nil {
@@ -54,8 +55,15 @@ func (mc Client) GetCredScoreOfUser(address string) (int, error) {
 		return 0, fmt.Errorf("could not decode response body: %w", err)
 	}
 
-	fmt.Println(credQueryResponse)
+	credString := credQueryResponse.Data.User.CredScoreAccrued
+	if len(credString) == 0 {
+		return 0, fmt.Errorf("user with address %s not found", address)
+	}
 
-	return 0, nil
+	credScore, err := strconv.ParseFloat(credString, 32)
+	if err != nil {
+		return 0, fmt.Errorf("failed to convert CRED score of %v", address)
+	}
 
+	return credScore / 100.0, nil
 }
