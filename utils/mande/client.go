@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	TrustDropsUrl string = "https://app.mande.network/subgraphs/name/TrustDrops"
+	trustDropsUrl string = "https://app.mande.network/subgraphs/name/TrustDrops"
 )
 
 type Client struct {
@@ -26,14 +26,14 @@ func NewClient() Client {
 	}
 }
 
-func (mc Client) GetCredScoreOfUser(address string) (float64, error) {
+func (mc Client) GetCredOfUser(address string) (float64, error) {
 	credQueryRequest := generateCredQueryRequest(address)
 	reqBody, err := json.Marshal(&credQueryRequest)
 	if err != nil {
 		return 0, fmt.Errorf("get cred score of user: %w", err)
 	}
 
-	req, err := http.NewRequest(http.MethodPost, TrustDropsUrl, bytes.NewBuffer(reqBody))
+	req, err := http.NewRequest(http.MethodPost, trustDropsUrl, bytes.NewBuffer(reqBody))
 	if err != nil {
 		return 0, fmt.Errorf("could not create request: %w", err)
 	}
@@ -57,7 +57,7 @@ func (mc Client) GetCredScoreOfUser(address string) (float64, error) {
 
 	credString := credQueryResponse.Data.User.CredScoreAccrued
 	if len(credString) == 0 {
-		return 0, fmt.Errorf("user with address %s not found", address)
+		return 0, nil
 	}
 
 	credScore, err := strconv.ParseFloat(credString, 32)
