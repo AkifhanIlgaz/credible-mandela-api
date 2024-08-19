@@ -43,9 +43,21 @@ func main() {
 
 	adService := services.NewAdService(ctx, db)
 	authService := services.NewAuthService(ctx, db)
+	tokenService := services.NewTokenService(ctx, db, config)
+
+	// TODO: optimize with separate function, interface
+	err = authService.Initialize()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = tokenService.Initialize()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	adController := controllers.NewAdController(adService)
-	authController := controllers.NewAuthController(authService, mandeClient)
+	authController := controllers.NewAuthController(authService, tokenService, mandeClient)
 
 	adRouter := routers.NewAdRouter(adController)
 	authRouter := routers.NewAuthRouter(authController)

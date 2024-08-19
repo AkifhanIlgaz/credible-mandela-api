@@ -13,46 +13,47 @@ type RegisterForm struct {
 	Password        string `json:"password" binding:"required,min=6"`
 	ConfirmPassword string `json:"confirmPassword" binding:"required,min=6"`
 	Address         string `json:"address" binding:"required"`
+	Signature       string `json:"signature" binding:"required"`
 }
 
-type RegisterFormWithSignature struct {
-	RegisterForm
-	Signature string `json:"signature" binding:"required"`
-}
-
-func (rf RegisterFormWithSignature) Validate() error {
-	if rf.Password != rf.ConfirmPassword {
+func (form RegisterForm) Validate() error {
+	if form.Password != form.ConfirmPassword {
 		return fmt.Errorf("validate register form: password does not match")
 	}
 
-	if !common.IsHexAddress(rf.Address) {
-		return fmt.Errorf("validate register form: %s is not valid ethereum address", rf.Address)
+	if !common.IsHexAddress(form.Address) {
+		return fmt.Errorf("validate register form: %s is not valid ethereum address", form.Address)
 	}
 
-	msg, err := json.Marshal(&rf.RegisterForm)
+	msg, err := json.Marshal(form)
 	if err != nil {
 		return fmt.Errorf("validate register form: %w", err)
 	}
 
-	err = crypto.VerifySignature(msg, rf.Signature, rf.Address)
+	err = crypto.VerifySignature(msg, form.Signature, form.Address)
 	if err != nil {
-
 		return fmt.Errorf("validate register form: %w", err)
 	}
 
 	return nil
 }
 
-func (rf RegisterForm) ToUser() (User, error) {
-	passwordHash, err := crypto.HashPassword(rf.Password)
+func (form RegisterForm) ToUser() (User, error) {
+	passwordHash, err := crypto.HashPassword(form.Password)
 	if err != nil {
 		return User{}, fmt.Errorf("convert register form to user: %w", err)
 	}
 
 	return User{
-		Username:     rf.Username,
+		Username:     form.Username,
 		PasswordHash: passwordHash,
-		Address:      rf.Address,
+		Address:      form.Address,
 		Roles:        "",
 	}, nil
+}
+
+type RegisterResponse struct {
+	Uid          string `json:"uid"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
 }

@@ -21,16 +21,14 @@ func TestVerifySignature(t *testing.T) {
 	publicKey := privateKey.PublicKey
 	address := crypto.PubkeyToAddress(publicKey).Hex()
 
-	data := models.RegisterFormWithSignature{
-		RegisterForm: models.RegisterForm{
-			Username:        "testing",
-			Password:        "123456",
-			ConfirmPassword: "123456",
-			Address:         address,
-		},
+	data := models.RegisterForm{
+		Username:        "testing",
+		Password:        "123456",
+		ConfirmPassword: "123456",
+		Address:         address,
 	}
 
-	msg, err := json.Marshal(&data.RegisterForm)
+	msg, err := json.Marshal(&data)
 	if err != nil {
 		t.Error(err)
 	}

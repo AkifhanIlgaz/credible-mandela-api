@@ -7,14 +7,8 @@ const (
 	StatusError   string = "error"
 )
 
-var (
-	successResponseBase = gin.H{
-		"status": StatusSuccess,
-	}
-)
-
-func WithSuccess(ctx *gin.Context, statusCode int, data gin.H) {
-	ctx.JSON(statusCode, mergeResponseData(successResponseBase, data))
+func WithSuccess(ctx *gin.Context, statusCode int, data any) {
+	ctx.JSON(statusCode, data)
 }
 
 func WithError(ctx *gin.Context, statusCode int, message string) {
@@ -22,11 +16,4 @@ func WithError(ctx *gin.Context, statusCode int, message string) {
 		"status":  StatusError,
 		"message": message,
 	})
-}
-
-func mergeResponseData(base gin.H, data gin.H) gin.H {
-	for key, value := range data {
-		base[key] = value
-	}
-	return base
 }

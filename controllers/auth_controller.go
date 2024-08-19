@@ -13,14 +13,16 @@ import (
 )
 
 type AuthController struct {
-	authService services.AuthService
-	mandeClient mande.Client
+	authService  services.AuthService
+	tokenService services.TokenService
+	mandeClient  mande.Client
 }
 
-func NewAuthController(authService services.AuthService, mandeClient mande.Client) AuthController {
+func NewAuthController(authService services.AuthService, tokenService services.TokenService, mandeClient mande.Client) AuthController {
 	return AuthController{
-		authService: authService,
-		mandeClient: mandeClient,
+		authService:  authService,
+		mandeClient:  mandeClient,
+		tokenService: tokenService,
 	}
 }
 
@@ -29,7 +31,7 @@ func (controller AuthController) Login(ctx *gin.Context) {
 }
 
 func (controller AuthController) Register(ctx *gin.Context) {
-	var form models.RegisterFormWithSignature
+	var form models.RegisterForm
 
 	if err := ctx.ShouldBindJSON(&form); err != nil {
 		log.Println(err.Error())
@@ -70,8 +72,24 @@ func (controller AuthController) Register(ctx *gin.Context) {
 		return
 	}
 
-	response.WithSuccess(ctx, http.StatusOK, gin.H{
-		"userId": userId.Hex(),
+	accessToken, err := controller.tokenService.GenerateAccessToken(userId.Hex())
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusConflict, err.Error())
+		return
+	}
+
+	refreshToken, err := controller.tokenService.GenerateRefreshToken(userId.Hex())
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusConflict, err.Error())
+		return
+	}
+
+	response.WithSuccess(ctx, http.StatusOK, models.RegisterResponse{
+		Uid:          userId.Hex(),
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 	})
 }
 
