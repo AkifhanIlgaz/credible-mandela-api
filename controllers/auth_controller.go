@@ -134,9 +134,25 @@ func (controller AuthController) Register(ctx *gin.Context) {
 }
 
 func (controller AuthController) Logout(ctx *gin.Context) {
+	var form models.LogoutForm
 
+	if err := ctx.ShouldBindJSON(&form); err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := controller.tokenService.DeleteRefreshToken(form.RefreshToken); err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response.WithSuccess(ctx, http.StatusOK, gin.H{
+		"message": "successfully logged out",
+	})
 }
 
 func (controller AuthController) Refresh(ctx *gin.Context) {
-
+	
 }

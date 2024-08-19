@@ -68,3 +68,7 @@ type LoginResponse struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
 }
+
+type LogoutForm struct {
+	RefreshToken string `json:"refreshToken"`
+}
