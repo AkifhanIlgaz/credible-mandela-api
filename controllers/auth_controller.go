@@ -7,6 +7,7 @@ import (
 
 	"github.com/AkifhanIlgaz/credible-mandela-api/models"
 	"github.com/AkifhanIlgaz/credible-mandela-api/services"
+	"github.com/AkifhanIlgaz/credible-mandela-api/utils/crypto"
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/mande"
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/response"
 	"github.com/gin-gonic/gin"
@@ -27,7 +28,46 @@ func NewAuthController(authService services.AuthService, tokenService services.T
 }
 
 func (controller AuthController) Login(ctx *gin.Context) {
+	var form models.LoginForm
 
+	if err := ctx.ShouldBindJSON(&form); err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	user, err := controller.authService.GetUserByUsername(form.Username)
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	if err := crypto.VerifyPassword(user.PasswordHash, form.Password); err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusUnauthorized, "wrong password")
+		return
+	}
+
+	accessToken, err := controller.tokenService.GenerateAccessToken(user.Id.Hex())
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusConflict, err.Error())
+		return
+	}
+
+	refreshToken, err := controller.tokenService.GenerateRefreshToken(user.Id.Hex())
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusConflict, err.Error())
+		return
+	}
+
+	response.WithSuccess(ctx, http.StatusOK, models.LoginResponse{
+		Uid:          user.Id.Hex(),
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	})
 }
 
 func (controller AuthController) Register(ctx *gin.Context) {

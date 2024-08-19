@@ -58,3 +58,20 @@ func (service AuthService) CreateUser(user models.User) (primitive.ObjectID, err
 
 	return result.InsertedID.(primitive.ObjectID), nil
 }
+
+func (service AuthService) GetUserByUsername(username string) (models.User, error) {
+	collection := service.db.Collection(db.UsersCollection)
+
+	filter := bson.M{
+		"username": username,
+	}
+
+	var user models.User
+
+	err := collection.FindOne(service.ctx, filter).Decode(&user)
+	if err != nil {
+		return user, fmt.Errorf("get user by username: %w", err)
+	}
+
+	return user, nil
+}
