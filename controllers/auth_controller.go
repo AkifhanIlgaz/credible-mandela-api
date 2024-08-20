@@ -115,14 +115,14 @@ func (controller AuthController) Register(ctx *gin.Context) {
 	accessToken, err := controller.tokenService.GenerateAccessToken(userId.Hex())
 	if err != nil {
 		log.Println(err.Error())
-		response.WithError(ctx, http.StatusConflict, err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	refreshToken, err := controller.tokenService.GenerateRefreshToken(userId.Hex())
 	if err != nil {
 		log.Println(err.Error())
-		response.WithError(ctx, http.StatusConflict, err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -154,5 +154,33 @@ func (controller AuthController) Logout(ctx *gin.Context) {
 }
 
 func (controller AuthController) Refresh(ctx *gin.Context) {
-	
+	var form models.RefreshTokenForm
+
+	if err := ctx.ShouldBindJSON(&form); err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	// Extract uid from middleware
+	uid := ctx.GetString("uid")
+
+	accessToken, err := controller.tokenService.GenerateAccessToken(uid)
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	refreshToken, err := controller.tokenService.RegenerateRefreshToken(form.RefreshToken, uid)
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response.WithSuccess(ctx, http.StatusOK, models.RefreshTokenResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	})
 }

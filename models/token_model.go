@@ -7,3 +7,12 @@ type RefreshToken struct {
 	Token     string
 	ExpiresAt time.Time
 }
+
+type RefreshTokenForm struct {
+	RefreshToken string `form:"refreshToken" binding:"required"`
+}
+
+type RefreshTokenResponse struct {
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
+}

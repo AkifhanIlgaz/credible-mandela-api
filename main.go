@@ -7,6 +7,7 @@ import (
 
 	cfg "github.com/AkifhanIlgaz/credible-mandela-api/config"
 	"github.com/AkifhanIlgaz/credible-mandela-api/controllers"
+	"github.com/AkifhanIlgaz/credible-mandela-api/middlewares"
 	"github.com/AkifhanIlgaz/credible-mandela-api/routers"
 	"github.com/AkifhanIlgaz/credible-mandela-api/services"
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/constants"
@@ -59,8 +60,10 @@ func main() {
 	adController := controllers.NewAdController(adService)
 	authController := controllers.NewAuthController(authService, tokenService, mandeClient)
 
+	authMiddleware := middlewares.NewAuthMiddleware(authService, tokenService)
+
 	adRouter := routers.NewAdRouter(adController)
-	authRouter := routers.NewAuthRouter(authController)
+	authRouter := routers.NewAuthRouter(authController, authMiddleware)
 
 	server := gin.Default()
 	setCors(server)
