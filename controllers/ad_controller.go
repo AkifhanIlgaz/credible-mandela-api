@@ -15,11 +15,23 @@ func NewAdController(adService services.AdService) AdController {
 	}
 }
 
-func (controller AdController) PublishAd(ctx *gin.Context) {
+func (controller AdController) GetAllAds(ctx *gin.Context) {
 
 }
 
-func (controller AdController) GetAllAds(ctx *gin.Context) {
+func (controller AdController) GetAdsByPage(ctx *gin.Context) {
+	
+}
+
+func (controller AdController) GetAdById(ctx *gin.Context) {
+
+}
+
+func (controller AdController) GetAdsOfUser(ctx *gin.Context) {
+
+}
+
+func (controller AdController) PublishAd(ctx *gin.Context) {
 
 }
 
@@ -28,9 +40,5 @@ func (controller AdController) DeleteAd(ctx *gin.Context) {
 }
 
 func (controller AdController) EditAd(ctx *gin.Context) {
-
-}
-
-func (controller AdController) GetAdsOfUser(ctx *gin.Context) {
 
 }

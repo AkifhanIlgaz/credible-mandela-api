@@ -45,6 +45,7 @@ func main() {
 	adService := services.NewAdService(ctx, db)
 	authService := services.NewAuthService(ctx, db)
 	tokenService := services.NewTokenService(ctx, db, config)
+	communityNoteService := services.NewCommunityNoteService(ctx, db)
 
 	// TODO: optimize with separate function, interface
 	err = authService.Initialize()
@@ -59,11 +60,13 @@ func main() {
 
 	adController := controllers.NewAdController(adService)
 	authController := controllers.NewAuthController(authService, tokenService, mandeClient)
+	communityNoteController := controllers.NewCommunityNoteController(communityNoteService)
 
 	authMiddleware := middlewares.NewAuthMiddleware(authService, tokenService)
 
 	adRouter := routers.NewAdRouter(adController)
 	authRouter := routers.NewAuthRouter(authController, authMiddleware)
+	communityNoteRouter := routers.NewCommunityNoteRouter(communityNoteController)
 
 	server := gin.Default()
 	setCors(server)
@@ -72,6 +75,7 @@ func main() {
 
 	adRouter.Setup(router)
 	authRouter.Setup(router)
+	communityNoteRouter.Setup(router)
 
 	err = server.Run(fmt.Sprintf(":%v", constants.Port))
 	if err != nil {
