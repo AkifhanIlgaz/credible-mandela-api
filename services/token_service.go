@@ -13,6 +13,7 @@ import (
 	jwt "github.com/golang-jwt/jwt/v4"
 	"github.com/thanhpk/randstr"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -45,7 +46,7 @@ func (service TokenService) Initialize() error {
 	return nil
 }
 
-func (service TokenService) GenerateAccessToken(uid string) (string, error) {
+func (service TokenService) GenerateAccessToken(uid, address, username string) (string, error) {
 	decodedPrivateKey, err := base64.StdEncoding.DecodeString(service.config.AccessTokenPrivateKey)
 	if err != nil {
 		return "", fmt.Errorf("generate access token: %w", err)
@@ -57,8 +58,13 @@ func (service TokenService) GenerateAccessToken(uid string) (string, error) {
 	}
 
 	expiresAt := jwt.NewNumericDate(time.Now().Add(time.Duration(service.config.AccessTokenExpiry) * time.Hour))
-	claims := jwt.RegisteredClaims{
-		ExpiresAt: expiresAt,
+	claims := models.AccessTokenClaims{
+		Username: username,
+		Address:  address,
+		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   uid,
+			ExpiresAt: expiresAt,
+		},
 	}
 
 	token, err := jwt.NewWithClaims(jwt.SigningMethodRS256, claims).SignedString(privateKey)
@@ -69,28 +75,40 @@ func (service TokenService) GenerateAccessToken(uid string) (string, error) {
 	return token, nil
 }
 
-func (service TokenService) ExtractUidFromAccessToken(accessToken string) (string, error) {
+func (service TokenService) ExtractUserFromAccessToken(accessToken string) (models.User, error) {
 	decodedPublicKey, err := base64.StdEncoding.DecodeString(service.config.AccessTokenPublicKey)
 	if err != nil {
-		return "", fmt.Errorf("extract uid from access token: %w", err)
+		return models.User{}, fmt.Errorf("extract uid from access token: %w", err)
 	}
 
-	parsedToken, err := jwt.ParseWithClaims(accessToken, &jwt.RegisteredClaims{}, func(t *jwt.Token) (interface{}, error) {
+	parsedToken, err := jwt.ParseWithClaims(accessToken, &models.AccessTokenClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
 			return jwt.RegisteredClaims{}, fmt.Errorf("unexpected method: %s", t.Header["alg"])
 		}
 		return jwt.ParseRSAPublicKeyFromPEM(decodedPublicKey)
 	})
+
 	if err != nil {
-		return "", fmt.Errorf("extract uid from access token: %w", err)
+		return models.User{}, fmt.Errorf("extract uid from access token: %w", err)
 	}
 
-	claims, ok := parsedToken.Claims.(*jwt.RegisteredClaims)
+	claims, ok := parsedToken.Claims.(*models.AccessTokenClaims)
 	if !ok || !parsedToken.Valid {
-		return "", fmt.Errorf("invalid token")
+		return models.User{}, fmt.Errorf("invalid token")
 	}
 
-	return claims.Subject, nil
+	id, err := primitive.ObjectIDFromHex(claims.Subject)
+	if err != nil {
+		return models.User{}, fmt.Errorf("extract uid from access token: %w", err)
+	}
+
+	user := models.User{
+		Username: claims.Username,
+		Address:  claims.Address,
+		Id:       id,
+	}
+
+	return user, nil
 }
 
 func (service TokenService) GenerateRefreshToken(uid string) (string, error) {

@@ -27,12 +27,15 @@ func (middleware AuthMiddleware) ExtractUidFromAuthHeader() gin.HandlerFunc {
 		t := strings.Fields(authHeader)
 		if len(t) == 2 {
 			accessToken := t[1]
-			uid, err := middleware.tokenService.ExtractUidFromAccessToken(accessToken)
+			user, err := middleware.tokenService.ExtractUserFromAccessToken(accessToken)
 			if err != nil {
 				response.WithError(ctx, http.StatusUnauthorized, err.Error())
 				return
 			}
-			ctx.Set("uid", uid)
+
+			ctx.Set("uid", user.Id)
+			ctx.Set("username", user.Username)
+			ctx.Set("address", user.Address)
 			ctx.Next()
 			return
 		}

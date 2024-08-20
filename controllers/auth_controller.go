@@ -49,7 +49,7 @@ func (controller AuthController) Login(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, err := controller.tokenService.GenerateAccessToken(user.Id.Hex())
+	accessToken, err := controller.tokenService.GenerateAccessToken(user.Id.Hex(), user.Address, user.Username)
 	if err != nil {
 		log.Println(err.Error())
 		response.WithError(ctx, http.StatusConflict, err.Error())
@@ -112,7 +112,7 @@ func (controller AuthController) Register(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, err := controller.tokenService.GenerateAccessToken(userId.Hex())
+	accessToken, err := controller.tokenService.GenerateAccessToken(userId.Hex(), user.Address, user.Username)
 	if err != nil {
 		log.Println(err.Error())
 		response.WithError(ctx, http.StatusInternalServerError, err.Error())
@@ -164,8 +164,10 @@ func (controller AuthController) Refresh(ctx *gin.Context) {
 
 	// Extract uid from middleware
 	uid := ctx.GetString("uid")
+	address := ctx.GetString("address")
+	username := ctx.GetString("username")
 
-	accessToken, err := controller.tokenService.GenerateAccessToken(uid)
+	accessToken, err := controller.tokenService.GenerateAccessToken(uid, address, username)
 	if err != nil {
 		log.Println(err.Error())
 		response.WithError(ctx, http.StatusInternalServerError, err.Error())
