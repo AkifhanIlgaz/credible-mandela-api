@@ -16,6 +16,22 @@ type RegisterForm struct {
 	Signature       string `json:"signature" binding:"required"`
 }
 
+func (form RegisterForm) WithoutSignature() RegisterFormWithoutSignature {
+	return RegisterFormWithoutSignature{
+		Username:        form.Username,
+		Password:        form.Password,
+		ConfirmPassword: form.ConfirmPassword,
+		Address:         form.Address,
+	}
+}
+
+type RegisterFormWithoutSignature struct {
+	Username        string `json:"username" binding:"required,min=1"`
+	Password        string `json:"password" binding:"required,min=6"`
+	ConfirmPassword string `json:"confirmPassword" binding:"required,min=6"`
+	Address         string `json:"address" binding:"required"`
+}
+
 func (form RegisterForm) Validate() error {
 	if form.Password != form.ConfirmPassword {
 		return fmt.Errorf("validate register form: password does not match")
@@ -25,7 +41,7 @@ func (form RegisterForm) Validate() error {
 		return fmt.Errorf("validate register form: %s is not valid ethereum address", form.Address)
 	}
 
-	msg, err := json.Marshal(form)
+	msg, err := json.Marshal(form.WithoutSignature())
 	if err != nil {
 		return fmt.Errorf("validate register form: %w", err)
 	}
