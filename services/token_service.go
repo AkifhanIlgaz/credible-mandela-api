@@ -107,7 +107,7 @@ func (service TokenService) GenerateRefreshToken(uid string) (string, error) {
 		return "", fmt.Errorf("generate refresh token: %w", err)
 	}
 
-	return "", nil
+	return refreshToken.Token, nil
 }
 
 func (service TokenService) RegenerateRefreshToken(token, uid string) (string, error) {
