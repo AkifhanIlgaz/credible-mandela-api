@@ -21,7 +21,7 @@ func NewAuthMiddleware(authService services.AuthService, tokenService services.T
 	}
 }
 
-func (middleware AuthMiddleware) ExtractUid() gin.HandlerFunc {
+func (middleware AuthMiddleware) ExtractUidFromAuthHeader() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.Request.Header.Get("Authorization")
 		t := strings.Fields(authHeader)

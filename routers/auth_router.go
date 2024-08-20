@@ -32,5 +32,5 @@ func (r AuthRouter) Setup(rg *gin.RouterGroup) {
 	router.POST(LoginPath, r.authController.Login)
 	router.POST(RegisterPath, r.authController.Register)
 	router.POST(LogoutPath, r.authController.Logout)
-	router.POST(RefreshPath, r.authMiddleware.ExtractUid(), r.authController.Refresh)
+	router.POST(RefreshPath, r.authMiddleware.ExtractUidFromAuthHeader(), r.authController.Refresh)
 }
