@@ -56,7 +56,7 @@ func (controller AuthController) Login(ctx *gin.Context) {
 		return
 	}
 
-	refreshToken, err := controller.tokenService.GenerateRefreshToken(user.Id.Hex())
+	refreshToken, err := controller.tokenService.GenerateRefreshToken(user.Id.Hex(), user.Address, user.Username)
 	if err != nil {
 		log.Println(err.Error())
 		response.WithError(ctx, http.StatusConflict, err.Error())
@@ -119,7 +119,7 @@ func (controller AuthController) Register(ctx *gin.Context) {
 		return
 	}
 
-	refreshToken, err := controller.tokenService.GenerateRefreshToken(userId.Hex())
+	refreshToken, err := controller.tokenService.GenerateRefreshToken(userId.Hex(), user.Address, user.Username)
 	if err != nil {
 		log.Println(err.Error())
 		response.WithError(ctx, http.StatusInternalServerError, err.Error())
@@ -133,26 +133,6 @@ func (controller AuthController) Register(ctx *gin.Context) {
 	})
 }
 
-func (controller AuthController) Logout(ctx *gin.Context) {
-	var form models.LogoutForm
-
-	if err := ctx.ShouldBindJSON(&form); err != nil {
-		log.Println(err.Error())
-		response.WithError(ctx, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	if err := controller.tokenService.DeleteRefreshToken(form.RefreshToken); err != nil {
-		log.Println(err.Error())
-		response.WithError(ctx, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	response.WithSuccess(ctx, http.StatusOK, gin.H{
-		"message": "successfully logged out",
-	})
-}
-
 func (controller AuthController) Refresh(ctx *gin.Context) {
 	var form models.RefreshTokenForm
 
@@ -162,19 +142,21 @@ func (controller AuthController) Refresh(ctx *gin.Context) {
 		return
 	}
 
-	// Extract uid from middleware
-	uid := ctx.GetString("uid")
-	address := ctx.GetString("address")
-	username := ctx.GetString("username")
+	user, err := controller.tokenService.ExtractUserFromRefreshToken(form.RefreshToken)
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusUnauthorized, err.Error())
+		return
+	}
 
-	accessToken, err := controller.tokenService.GenerateAccessToken(uid, address, username)
+	accessToken, err := controller.tokenService.GenerateAccessToken(user.Id.Hex(), user.Address, user.Username)
 	if err != nil {
 		log.Println(err.Error())
 		response.WithError(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	refreshToken, err := controller.tokenService.RegenerateRefreshToken(form.RefreshToken, uid)
+	refreshToken, err := controller.tokenService.GenerateRefreshToken(user.Id.Hex(), user.Address, user.Username)
 	if err != nil {
 		log.Println(err.Error())
 		response.WithError(ctx, http.StatusInternalServerError, err.Error())

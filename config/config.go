@@ -7,11 +7,15 @@ import (
 )
 
 type Config struct {
-	MongoURI              string `mapstructure:"MONGO_URI"`
+	MongoURI string `mapstructure:"MONGO_URI"`
+
 	AccessTokenPrivateKey string `mapstructure:"ACCESS_TOKEN_PRIVATE_KEY"`
 	AccessTokenPublicKey  string `mapstructure:"ACCESS_TOKEN_PUBLIC_KEY"`
 	AccessTokenExpiry     int    `mapstructure:"ACCESS_TOKEN_EXPIRY_HOUR"`
-	RefreshTokenExpiry    int    `mapstructure:"REFRESH_TOKEN_EXPIRY_HOUR"`
+
+	RefreshTokenPrivateKey string `mapstructure:"REFRESH_TOKEN_PRIVATE_KEY"`
+	RefreshTokenPublicKey  string `mapstructure:"REFRESH_TOKEN_PUBLIC_KEY"`
+	RefreshTokenExpiry     int    `mapstructure:"REFRESH_TOKEN_EXPIRY_HOUR"`
 }
 
 func (c *Config) Validate() error {

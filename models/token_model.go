@@ -21,7 +21,7 @@ type RefreshTokenResponse struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
-type AccessTokenClaims struct {
+type TokenClaims struct {
 	Username string `json:"username"`
 	Address  string `json:"address"`
 	jwt.RegisteredClaims
