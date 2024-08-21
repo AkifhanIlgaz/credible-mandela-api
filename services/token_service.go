@@ -2,11 +2,13 @@ package services
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/AkifhanIlgaz/credible-mandela-api/config"
 	"github.com/AkifhanIlgaz/credible-mandela-api/models"
+	"github.com/AkifhanIlgaz/credible-mandela-api/utils/constants"
 	jwt "github.com/golang-jwt/jwt/v4"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -21,7 +23,18 @@ func NewTokenService(config config.Config) TokenService {
 	}
 }
 
-func (service TokenService) GenerateAccessToken(uid, address, username string) (string, error) {
+func (service TokenService) GenerateToken(tokenType, uid, address, username string) (string, error) {
+	switch tokenType {
+	case constants.AccessTokenType:
+		return service.generateAccessToken(uid, address, username)
+	case constants.RefreshTokenType:
+		return service.generateRefreshToken(uid, address, username)
+	default:
+		return "", errors.New("unsupported token type")
+	}
+}
+
+func (service TokenService) generateAccessToken(uid, address, username string) (string, error) {
 	decodedPrivateKey, err := base64.StdEncoding.DecodeString(service.config.AccessTokenPrivateKey)
 	if err != nil {
 		return "", fmt.Errorf("generate access token: %w", err)
@@ -122,7 +135,7 @@ func (service TokenService) ExtractUserFromRefreshToken(refreshToken string) (mo
 	return user, nil
 }
 
-func (service TokenService) GenerateRefreshToken(uid, address, username string) (string, error) {
+func (service TokenService) generateRefreshToken(uid, address, username string) (string, error) {
 	decodedPrivateKey, err := base64.StdEncoding.DecodeString(service.config.RefreshTokenPrivateKey)
 	if err != nil {
 		return "", fmt.Errorf("generate refresh token: %w", err)

@@ -7,6 +7,7 @@ import (
 
 	"github.com/AkifhanIlgaz/credible-mandela-api/models"
 	"github.com/AkifhanIlgaz/credible-mandela-api/services"
+	"github.com/AkifhanIlgaz/credible-mandela-api/utils/constants"
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/crypto"
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/mande"
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/response"
@@ -49,17 +50,17 @@ func (controller AuthController) Login(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, err := controller.tokenService.GenerateAccessToken(user.Id.Hex(), user.Address, user.Username)
+	accessToken, err := controller.tokenService.GenerateToken(constants.AccessTokenType, user.Id.Hex(), user.Address, user.Username)
 	if err != nil {
 		log.Println(err.Error())
-		response.WithError(ctx, http.StatusConflict, err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	refreshToken, err := controller.tokenService.GenerateRefreshToken(user.Id.Hex(), user.Address, user.Username)
+	refreshToken, err := controller.tokenService.GenerateToken(constants.RefreshTokenType, user.Id.Hex(), user.Address, user.Username)
 	if err != nil {
 		log.Println(err.Error())
-		response.WithError(ctx, http.StatusConflict, err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -112,14 +113,14 @@ func (controller AuthController) Register(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, err := controller.tokenService.GenerateAccessToken(userId.Hex(), user.Address, user.Username)
+	accessToken, err := controller.tokenService.GenerateToken(constants.AccessTokenType, userId.Hex(), user.Address, user.Username)
 	if err != nil {
 		log.Println(err.Error())
 		response.WithError(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	refreshToken, err := controller.tokenService.GenerateRefreshToken(userId.Hex(), user.Address, user.Username)
+	refreshToken, err := controller.tokenService.GenerateToken(constants.RefreshTokenType, userId.Hex(), user.Address, user.Username)
 	if err != nil {
 		log.Println(err.Error())
 		response.WithError(ctx, http.StatusInternalServerError, err.Error())
@@ -149,14 +150,14 @@ func (controller AuthController) Refresh(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, err := controller.tokenService.GenerateAccessToken(user.Id.Hex(), user.Address, user.Username)
+	accessToken, err := controller.tokenService.GenerateToken(constants.AccessTokenType, user.Id.Hex(), user.Address, user.Username)
 	if err != nil {
 		log.Println(err.Error())
 		response.WithError(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	refreshToken, err := controller.tokenService.GenerateRefreshToken(user.Id.Hex(), user.Address, user.Username)
+	refreshToken, err := controller.tokenService.GenerateToken(constants.RefreshTokenType, user.Id.Hex(), user.Address, user.Username)
 	if err != nil {
 		log.Println(err.Error())
 		response.WithError(ctx, http.StatusInternalServerError, err.Error())
