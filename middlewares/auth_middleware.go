@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/AkifhanIlgaz/credible-mandela-api/services"
+	"github.com/AkifhanIlgaz/credible-mandela-api/utils/constants"
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/response"
 	"github.com/gin-gonic/gin"
 )
@@ -33,9 +34,9 @@ func (middleware AuthMiddleware) ExtractUidFromAuthHeader() gin.HandlerFunc {
 				return
 			}
 
-			ctx.Set("uid", user.Id)
-			ctx.Set("username", user.Username)
-			ctx.Set("address", user.Address)
+			ctx.Set(constants.CtxUid, user.Id)
+			ctx.Set(constants.CtxUsername, user.Username)
+			ctx.Set(constants.CtxAddress, user.Address)
 			ctx.Next()
 			return
 		}

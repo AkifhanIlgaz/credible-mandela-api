@@ -22,22 +22,20 @@ func NewAdService(ctx context.Context, db *mongo.Database) AdService {
 	}
 }
 
-func (service AdService) CreateAd(ad *models.Ad) error {
+func (service AdService) CreateAd(ad models.Ad) (string, error) {
 	collection := service.db.Collection(db.AdCollection)
 
 	res, err := collection.InsertOne(context.Background(), ad)
 	if err != nil {
-		return fmt.Errorf("generate refresh token: %w", err)
+		return "", fmt.Errorf("create ad: %w", err)
 	}
 
 	id, ok := res.InsertedID.(primitive.ObjectID)
 	if !ok {
-		return fmt.Errorf("could not cast inserted ID to ObjectID")
+		return "", fmt.Errorf("could not cast inserted ID to ObjectID")
 	}
 
-	ad.Id = id
-
-	return nil
+	return id.Hex(), nil
 }
 
 // TODO: Create service functions

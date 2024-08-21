@@ -3,17 +3,21 @@ package response
 import "github.com/gin-gonic/gin"
 
 const (
-	StatusSuccess string = "success"
-	StatusError   string = "error"
+	statusSuccess string = "success"
+	statusError   string = "error"
 )
 
-func WithSuccess(ctx *gin.Context, statusCode int, data any) {
-	ctx.JSON(statusCode, data)
+func WithSuccess(ctx *gin.Context, statusCode int, message string, data any) {
+	ctx.JSON(statusCode, gin.H{
+		"status":  statusSuccess,
+		"message": message,
+		"result":  data,
+	})
 }
 
 func WithError(ctx *gin.Context, statusCode int, message string) {
 	ctx.AbortWithStatusJSON(statusCode, gin.H{
-		"status":  StatusError,
+		"status":  statusError,
 		"message": message,
 	})
 }

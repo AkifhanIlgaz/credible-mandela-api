@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/constants"
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/crypto"
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/mande"
+	"github.com/AkifhanIlgaz/credible-mandela-api/utils/message"
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/response"
 	"github.com/gin-gonic/gin"
 )
@@ -46,7 +46,7 @@ func (controller AuthController) Login(ctx *gin.Context) {
 
 	if err := crypto.VerifyPassword(user.PasswordHash, form.Password); err != nil {
 		log.Println(err.Error())
-		response.WithError(ctx, http.StatusUnauthorized, "wrong password")
+		response.WithError(ctx, http.StatusUnauthorized, message.WrongPassword)
 		return
 	}
 
@@ -64,7 +64,7 @@ func (controller AuthController) Login(ctx *gin.Context) {
 		return
 	}
 
-	response.WithSuccess(ctx, http.StatusOK, models.LoginResponse{
+	response.WithSuccess(ctx, http.StatusOK, message.LoginSuccess, models.LoginResponse{
 		Uid:          user.Id.Hex(),
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
@@ -102,7 +102,7 @@ func (controller AuthController) Register(ctx *gin.Context) {
 
 	if hasEnoughCred := mande.IsEnoughCredToRegister(cred); !hasEnoughCred {
 		log.Printf("%v does not have enough cred to register", user.Address)
-		response.WithError(ctx, http.StatusInternalServerError, fmt.Sprintf("%v does not have enough cred to register", user.Address))
+		response.WithError(ctx, http.StatusInternalServerError, message.InsufficientCred)
 		return
 	}
 
@@ -127,7 +127,7 @@ func (controller AuthController) Register(ctx *gin.Context) {
 		return
 	}
 
-	response.WithSuccess(ctx, http.StatusOK, models.RegisterResponse{
+	response.WithSuccess(ctx, http.StatusOK, message.RegisterSuccess, models.RegisterResponse{
 		Uid:          userId.Hex(),
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
@@ -164,7 +164,7 @@ func (controller AuthController) Refresh(ctx *gin.Context) {
 		return
 	}
 
-	response.WithSuccess(ctx, http.StatusOK, models.RefreshTokenResponse{
+	response.WithSuccess(ctx, http.StatusOK, message.TokensRefreshed, models.RefreshTokenResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	})
