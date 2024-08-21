@@ -24,7 +24,7 @@ func NewAdService(ctx context.Context, db *mongo.Database) AdService {
 	}
 }
 
-func (service AdService) CreateAd(ad models.Ad) (string, error) {
+func (service AdService) Create(ad models.Ad) (string, error) {
 	collection := service.db.Collection(db.AdCollection)
 
 	res, err := collection.InsertOne(context.Background(), ad)
@@ -40,7 +40,7 @@ func (service AdService) CreateAd(ad models.Ad) (string, error) {
 	return id.Hex(), nil
 }
 
-func (service AdService) DeleteAdById(adId string) error {
+func (service AdService) DeleteById(adId string) error {
 	collection := service.db.Collection(db.AdCollection)
 
 	id, err := primitive.ObjectIDFromHex(adId)
@@ -64,4 +64,31 @@ func (service AdService) DeleteAdById(adId string) error {
 	return nil
 }
 
-// TODO: Create service functions
+func (service AdService) UpdateById(adId string, newAmount float64) error {
+	collection := service.db.Collection(db.AdCollection)
+
+	id, err := primitive.ObjectIDFromHex(adId)
+	if err != nil {
+		return fmt.Errorf("delete ad: %w", err)
+	}
+
+	filter := bson.M{
+		"_id": id,
+	}
+	update := bson.M{
+		"$set": bson.M{
+			"amount": newAmount,
+		},
+	}
+
+	result, err := collection.UpdateOne(service.ctx, filter, update)
+	if err != nil {
+		return err
+	}
+
+	if result.MatchedCount == 0 {
+		return errors.New("ad not found")
+	}
+
+	return nil
+}

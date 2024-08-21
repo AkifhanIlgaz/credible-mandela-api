@@ -1,8 +1,9 @@
 package message
 
 const (
-	AdPublished string = "Your ad has been successfully published!"
+	AdPublished string = "Ad published successfully!"
 	AdDeleted   string = "Ad deleted successfully!"
+	AdEdited    string = "Ad updated successfully!"
 )
 
 const (

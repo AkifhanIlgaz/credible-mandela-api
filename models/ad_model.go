@@ -21,4 +21,6 @@ type PublishAdResponse struct {
 	AdId string `json:"adId"`
 }
 
-
+type UpdateAdForm struct {
+	NewAmount float64 `json:"newAmount" binding:"required"`
+}

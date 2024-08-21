@@ -27,7 +27,7 @@ func (r AdRouter) Setup(rg *gin.RouterGroup) {
 
 	router.POST("/", r.adController.PublishAd)     // Publish an ad
 	router.DELETE("/:id", r.adController.DeleteAd) // Delete ad by ID
-	router.PUT("/:id", r.adController.EditAd)      // Edit ad by ID
+	router.PUT("/:id", r.adController.UpdateAd)    // Edit ad by ID
 
 	router.GET("/:id", r.adController.GetAdById)              // Get ad by ID
 	router.GET("/", r.adController.GetAllAds)                 // Get all ads

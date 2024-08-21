@@ -59,7 +59,7 @@ func (controller AdController) PublishAd(ctx *gin.Context) {
 		CreatedAt:  time.Now(),
 	}
 
-	adId, err := controller.adService.CreateAd(ad)
+	adId, err := controller.adService.Create(ad)
 	if err != nil {
 		log.Println(err.Error())
 		response.WithError(ctx, http.StatusInternalServerError, err.Error())
@@ -79,7 +79,7 @@ func (controller AdController) DeleteAd(ctx *gin.Context) {
 		return
 	}
 
-	err := controller.adService.DeleteAdById(adId)
+	err := controller.adService.DeleteById(adId)
 	if err != nil {
 		// TODO: Update error handling
 		log.Println(err.Error())
@@ -90,6 +90,34 @@ func (controller AdController) DeleteAd(ctx *gin.Context) {
 	response.WithSuccess(ctx, http.StatusOK, message.AdDeleted, nil)
 }
 
-func (controller AdController) EditAd(ctx *gin.Context) {
+func (controller AdController) UpdateAd(ctx *gin.Context) {
+	adId := ctx.Param("id")
 
+	if len(adId) == 0 {
+		response.WithError(ctx, http.StatusBadRequest, message.MissingId)
+		return
+	}
+
+	var form models.UpdateAdForm
+
+	if err := ctx.ShouldBindJSON(&form); err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if form.NewAmount <= 0 {
+		response.WithError(ctx, http.StatusBadRequest, message.StakeAmountInvalid)
+		return
+	}
+
+	err := controller.adService.UpdateById(adId, form.NewAmount)
+	if err != nil {
+		// TODO: Update error handling
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response.WithSuccess(ctx, http.StatusOK, message.AdEdited, nil)
 }
