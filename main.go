@@ -59,7 +59,7 @@ func main() {
 
 	authMiddleware := middlewares.NewAuthMiddleware(authService, tokenService)
 
-	adRouter := routers.NewAdRouter(adController)
+	adRouter := routers.NewAdRouter(adController, authMiddleware)
 	authRouter := routers.NewAuthRouter(authController, authMiddleware)
 	communityNoteRouter := routers.NewCommunityNoteRouter(communityNoteController)
 

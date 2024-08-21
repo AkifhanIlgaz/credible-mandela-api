@@ -67,12 +67,27 @@ func (controller AdController) PublishAd(ctx *gin.Context) {
 	}
 
 	response.WithSuccess(ctx, http.StatusOK, message.AdPublished, models.PublishAdResponse{
-		Id: adId,
+		AdId: adId,
 	})
 }
 
 func (controller AdController) DeleteAd(ctx *gin.Context) {
+	adId := ctx.Param("id")
 
+	if len(adId) == 0 {
+		response.WithError(ctx, http.StatusBadRequest, message.MissingId)
+		return
+	}
+
+	err := controller.adService.DeleteAdById(adId)
+	if err != nil {
+		// TODO: Update error handling
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response.WithSuccess(ctx, http.StatusOK, message.AdDeleted, nil)
 }
 
 func (controller AdController) EditAd(ctx *gin.Context) {
