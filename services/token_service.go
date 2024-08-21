@@ -1,47 +1,24 @@
 package services
 
 import (
-	"context"
 	"encoding/base64"
 	"fmt"
 	"time"
 
 	"github.com/AkifhanIlgaz/credible-mandela-api/config"
 	"github.com/AkifhanIlgaz/credible-mandela-api/models"
-	"github.com/AkifhanIlgaz/credible-mandela-api/utils/db"
 	jwt "github.com/golang-jwt/jwt/v4"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type TokenService struct {
-	ctx    context.Context
 	config config.Config
-	db     *mongo.Database
 }
 
-func NewTokenService(ctx context.Context, db *mongo.Database, config config.Config) TokenService {
+func NewTokenService(config config.Config) TokenService {
 	return TokenService{
-		ctx:    ctx,
-		db:     db,
 		config: config,
 	}
-}
-
-func (service TokenService) Initialize() error {
-	collection := service.db.Collection(db.RefreshTokensCollection)
-
-	_, err := collection.Indexes().CreateOne(service.ctx, mongo.IndexModel{
-		Keys:    bson.D{{Key: "uid", Value: 1}},
-		Options: options.Index().SetUnique(true),
-	})
-	if err != nil {
-		return fmt.Errorf("initialize token service: %w", err)
-	}
-
-	return nil
 }
 
 func (service TokenService) GenerateAccessToken(uid, address, username string) (string, error) {

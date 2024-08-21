@@ -44,16 +44,11 @@ func main() {
 
 	adService := services.NewAdService(ctx, db)
 	authService := services.NewAuthService(ctx, db)
-	tokenService := services.NewTokenService(ctx, db, config)
+	tokenService := services.NewTokenService(config)
 	communityNoteService := services.NewCommunityNoteService(ctx, db)
 
 	// TODO: optimize with separate function, interface
 	err = authService.Initialize()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = tokenService.Initialize()
 	if err != nil {
 		log.Fatal(err)
 	}
