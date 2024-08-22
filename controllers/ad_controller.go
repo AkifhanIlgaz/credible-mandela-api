@@ -26,15 +26,19 @@ func NewAdController(adService services.AdService) AdController {
 }
 
 func (controller AdController) GetAllAds(ctx *gin.Context) {
+	ads, err := controller.adService.GetAds()
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, message.SomethingWentWrong)
+		return
+	}
 
-}
-
-func (controller AdController) GetAdsByPage(ctx *gin.Context) {
-
+	// ? Ad sayısı 0 ise farklı mesaj göster
+	response.WithSuccess(ctx, http.StatusOK, message.AdFound, ads)
 }
 
 func (controller AdController) GetAdById(ctx *gin.Context) {
-	adId := ctx.Param("id")
+	adId := ctx.Param(constants.ParamId)
 
 	if len(adId) == 0 {
 		response.WithError(ctx, http.StatusBadRequest, message.MissingId)
@@ -55,8 +59,32 @@ func (controller AdController) GetAdById(ctx *gin.Context) {
 	response.WithSuccess(ctx, http.StatusOK, message.AdFound, ad)
 }
 
-func (controller AdController) GetAdsOfUser(ctx *gin.Context) {
+func (controller AdController) GetAdsByAddress(ctx *gin.Context) {
+	address := ctx.Param(constants.ParamAddress)
 
+	ads, err := controller.adService.GetAdsByAddress(address)
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, message.SomethingWentWrong)
+		return
+	}
+
+	// ? Ad sayısı 0 ise farklı mesaj göster
+	response.WithSuccess(ctx, http.StatusOK, message.AdFound, ads)
+}
+
+func (controller AdController) GetAdsOfCurrentUser(ctx *gin.Context) {
+	address := ctx.GetString(constants.CtxAddress)
+
+	ads, err := controller.adService.GetAdsByAddress(address)
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, message.SomethingWentWrong)
+		return
+	}
+
+	// ? Ad sayısı 0 ise farklı mesaj göster
+	response.WithSuccess(ctx, http.StatusOK, message.AdFound, ads)
 }
 
 func (controller AdController) PublishAd(ctx *gin.Context) {
@@ -92,7 +120,7 @@ func (controller AdController) PublishAd(ctx *gin.Context) {
 }
 
 func (controller AdController) DeleteAd(ctx *gin.Context) {
-	adId := ctx.Param("id")
+	adId := ctx.Param(constants.ParamId)
 
 	if len(adId) == 0 {
 		response.WithError(ctx, http.StatusBadRequest, message.MissingId)
@@ -111,7 +139,7 @@ func (controller AdController) DeleteAd(ctx *gin.Context) {
 }
 
 func (controller AdController) UpdateAd(ctx *gin.Context) {
-	adId := ctx.Param("id")
+	adId := ctx.Param(constants.ParamId)
 
 	if len(adId) == 0 {
 		response.WithError(ctx, http.StatusBadRequest, message.MissingId)

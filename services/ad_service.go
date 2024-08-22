@@ -40,6 +40,46 @@ func (service AdService) Create(ad models.Ad) (string, error) {
 	return id.Hex(), nil
 }
 
+func (service AdService) GetAds() ([]models.Ad, error) {
+	collection := service.db.Collection(db.AdCollection)
+
+	cursor, err := collection.Find(service.ctx, bson.M{})
+	if err != nil {
+		return nil, fmt.Errorf("get ads: %w", err)
+	}
+
+	ads := []models.Ad{}
+
+	err = cursor.All(service.ctx, &ads)
+	if err != nil {
+		return nil, fmt.Errorf("get ads: %w", err)
+	}
+
+	return ads, nil
+}
+
+func (service AdService) GetAdsByAddress(address string) ([]models.Ad, error) {
+	collection := service.db.Collection(db.AdCollection)
+
+	filter := bson.M{
+		"advertiser": address,
+	}
+
+	cursor, err := collection.Find(service.ctx, filter)
+	if err != nil {
+		return nil, fmt.Errorf("get ads by address: %w", err)
+	}
+
+	ads := []models.Ad{}
+
+	err = cursor.All(service.ctx, &ads)
+	if err != nil {
+		return nil, fmt.Errorf("get ads by address: %w", err)
+	}
+
+	return ads, nil
+}
+
 func (service AdService) GetById(adId string) (models.Ad, error) {
 	collection := service.db.Collection(db.AdCollection)
 

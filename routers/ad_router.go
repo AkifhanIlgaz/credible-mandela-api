@@ -29,8 +29,8 @@ func (r AdRouter) Setup(rg *gin.RouterGroup) {
 	router.DELETE("/:id", r.adController.DeleteAd) // Delete ad by ID
 	router.PUT("/:id", r.adController.UpdateAd)    // Edit ad by ID
 
-	router.GET("/:id", r.adController.GetAdById)              // Get ad by ID
-	router.GET("/", r.adController.GetAllAds)                 // Get all ads
-	router.GET("/user/:address", r.adController.GetAdsOfUser) // Get all ads of user
-	router.GET("/page/:page", r.adController.GetAdsByPage)    // Get ads by page
+	router.GET("/:id", r.adController.GetAdById)                 // Get ad by ID
+	router.GET("/", r.adController.GetAllAds)                    // Get all ads
+	router.GET("/user/:address", r.adController.GetAdsByAddress) // Get all ads of user
+	router.GET("/user/me", r.adController.GetAdsOfCurrentUser)   // Get ads of current user
 }
