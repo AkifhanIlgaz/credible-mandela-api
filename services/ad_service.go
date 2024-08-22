@@ -40,6 +40,28 @@ func (service AdService) Create(ad models.Ad) (string, error) {
 	return id.Hex(), nil
 }
 
+func (service AdService) GetById(adId string) (models.Ad, error) {
+	collection := service.db.Collection(db.AdCollection)
+
+	id, err := primitive.ObjectIDFromHex(adId)
+	if err != nil {
+		return models.Ad{}, fmt.Errorf("get ad by id: %w", err)
+	}
+
+	filter := bson.M{
+		"_id": id,
+	}
+
+	var ad models.Ad
+
+	err = collection.FindOne(service.ctx, filter).Decode(&ad)
+	if err != nil {
+		return models.Ad{}, fmt.Errorf("get ad by id: %w", err)
+	}
+
+	return ad, nil
+}
+
 func (service AdService) DeleteById(adId string) error {
 	collection := service.db.Collection(db.AdCollection)
 

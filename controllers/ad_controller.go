@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"time"
@@ -11,6 +12,7 @@ import (
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/message"
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/response"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type AdController struct {
@@ -32,7 +34,25 @@ func (controller AdController) GetAdsByPage(ctx *gin.Context) {
 }
 
 func (controller AdController) GetAdById(ctx *gin.Context) {
+	adId := ctx.Param("id")
 
+	if len(adId) == 0 {
+		response.WithError(ctx, http.StatusBadRequest, message.MissingId)
+		return
+	}
+
+	ad, err := controller.adService.GetById(adId)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			response.WithError(ctx, http.StatusNotFound, message.AdNotFound)
+			return
+		}
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, message.SomethingWentWrong)
+		return
+	}
+
+	response.WithSuccess(ctx, http.StatusOK, message.AdFound, ad)
 }
 
 func (controller AdController) GetAdsOfUser(ctx *gin.Context) {
