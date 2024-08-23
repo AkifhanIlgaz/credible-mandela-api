@@ -87,3 +87,43 @@ func (service CommunityNoteService) GetById(communityNoteId string) (models.Comm
 
 	return communityNote, nil
 }
+
+func (service CommunityNoteService) GetAll() ([]models.CommunityNote, error) {
+	collection := service.db.Collection(db.CommunityNotesCollection)
+
+	cursor, err := collection.Find(service.ctx, bson.M{})
+	if err != nil {
+		return nil, fmt.Errorf("get all community notes: %w", err)
+	}
+
+	communityNotes := []models.CommunityNote{}
+
+	err = cursor.All(service.ctx, &communityNotes)
+	if err != nil {
+		return nil, fmt.Errorf("get all community notes: %w", err)
+	}
+
+	return communityNotes, nil
+}
+
+func (service CommunityNoteService) GetByUsername(username string) ([]models.CommunityNote, error) {
+	collection := service.db.Collection(db.CommunityNotesCollection)
+
+	filter := bson.M{
+		"publisher": username,
+	}
+
+	cursor, err := collection.Find(service.ctx, filter)
+	if err != nil {
+		return nil, fmt.Errorf("get all community notes of user: %w", err)
+	}
+
+	communityNotes := []models.CommunityNote{}
+
+	err = cursor.All(service.ctx, &communityNotes)
+	if err != nil {
+		return nil, fmt.Errorf("get all community notes of user: %w", err)
+	}
+
+	return communityNotes, nil
+}

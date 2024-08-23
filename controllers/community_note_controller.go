@@ -99,17 +99,59 @@ func (controller CommunityNoteController) Unlike(ctx *gin.Context) {
 }
 
 func (controller CommunityNoteController) GetById(ctx *gin.Context) {
+	communityNoteId := ctx.Param(constants.ParamId)
 
+	if len(communityNoteId) == 0 {
+		response.WithError(ctx, http.StatusBadRequest, message.MissingId)
+		return
+	}
+
+	communityNote, err := controller.communityNoteService.GetById(communityNoteId)
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response.WithSuccess(ctx, http.StatusOK, message.CommunityNoteFound, communityNote)
 }
 
 func (controller CommunityNoteController) GetAll(ctx *gin.Context) {
+	communityNotes, err := controller.communityNoteService.GetAll()
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, message.SomethingWentWrong)
+		return
+	}
 
+	// ? Ad sayısı 0 ise farklı mesaj göster
+	response.WithSuccess(ctx, http.StatusOK, message.CommunityNoteFound, communityNotes)
 }
 
 func (controller CommunityNoteController) GetNotesOfUser(ctx *gin.Context) {
+	username := ctx.Param(constants.CtxUsername)
 
+	communityNotes, err := controller.communityNoteService.GetByUsername(username)
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, message.SomethingWentWrong)
+		return
+	}
+
+	// ? Ad sayısı 0 ise farklı mesaj göster
+	response.WithSuccess(ctx, http.StatusOK, message.CommunityNoteFound, communityNotes)
 }
 
 func (controller CommunityNoteController) GetNotesOfCurrentUser(ctx *gin.Context) {
+	username := ctx.GetString(constants.CtxUsername)
 
+	communityNotes, err := controller.communityNoteService.GetByUsername(username)
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, message.SomethingWentWrong)
+		return
+	}
+
+	// ? Ad sayısı 0 ise farklı mesaj göster
+	response.WithSuccess(ctx, http.StatusOK, message.CommunityNoteFound, communityNotes)
 }

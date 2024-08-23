@@ -31,8 +31,8 @@ func (r CommunityNoteRouter) Setup(rg *gin.RouterGroup) {
 	router.DELETE("/:id", r.communityNoteController.Delete)      // Delete community note by id
 
 	router.GET("/:id", r.communityNoteController.GetById)                   // Get community note by ID
-	router.GET("/", r.communityNoteController.GetById)                      // Get all community notes + Sort
-	router.GET("/user/:address", r.communityNoteController.GetNotesOfUser)  // Get all community notes of user + Sort
+	router.GET("/", r.communityNoteController.GetAll)                       // Get all community notes + Sort
+	router.GET("/user/:username", r.communityNoteController.GetNotesOfUser) // Get all community notes of user + Sort
 	router.GET("/user/me", r.communityNoteController.GetNotesOfCurrentUser) // Get community notes of current user + Sort
 
 }
