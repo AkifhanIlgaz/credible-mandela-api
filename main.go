@@ -61,7 +61,7 @@ func main() {
 
 	adRouter := routers.NewAdRouter(adController, authMiddleware)
 	authRouter := routers.NewAuthRouter(authController, authMiddleware)
-	communityNoteRouter := routers.NewCommunityNoteRouter(communityNoteController)
+	communityNoteRouter := routers.NewCommunityNoteRouter(communityNoteController, authMiddleware)
 
 	server := gin.Default()
 	setCors(server)

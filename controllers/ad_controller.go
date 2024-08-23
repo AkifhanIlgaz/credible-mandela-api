@@ -127,7 +127,20 @@ func (controller AdController) DeleteAd(ctx *gin.Context) {
 		return
 	}
 
-	err := controller.adService.DeleteById(adId)
+	ad, err := controller.adService.GetById(adId)
+	if err != nil {
+		// TODO: Update error handling
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if ad.Advertiser != ctx.GetString(constants.CtxAddress) {
+		response.WithError(ctx, http.StatusUnauthorized, message.NotAuthorizedToDelete)
+		return
+	}
+
+	err = controller.adService.DeleteById(adId)
 	if err != nil {
 		// TODO: Update error handling
 		log.Println(err.Error())
