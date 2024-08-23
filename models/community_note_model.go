@@ -48,7 +48,7 @@ func (form PublishCommunityNoteForm) Validate() error {
 
 type Like struct {
 	Id              primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	CommunityNoteId primitive.ObjectID `json:"communityNoteId" bson:"communityNoteId"`
+	CommunityNoteId string             `json:"communityNoteId" bson:"communityNoteId"`
 	Username        string             `json:"username" bson:"username"`
 	CreatedAt       time.Time          `json:"createdAt" bson:"createdAt"`
 }

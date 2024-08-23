@@ -27,7 +27,7 @@ func NewCommunityNoteService(ctx context.Context, db *mongo.Database) CommunityN
 func (service CommunityNoteService) Create(communityNote models.CommunityNote) (string, error) {
 	collection := service.db.Collection(db.CommunityNotesCollection)
 
-	res, err := collection.InsertOne(context.Background(), communityNote)
+	res, err := collection.InsertOne(service.ctx, communityNote)
 	if err != nil {
 		return "", fmt.Errorf("create community note: %w", err)
 	}
@@ -126,4 +126,35 @@ func (service CommunityNoteService) GetByUsername(username string) ([]models.Com
 	}
 
 	return communityNotes, nil
+}
+
+func (service CommunityNoteService) Like(like models.Like) error {
+	collection := service.db.Collection(db.LikeCollection)
+
+	_, err := collection.InsertOne(service.ctx, like)
+	if err != nil {
+		return fmt.Errorf("like: %w", err)
+	}
+
+	return nil
+}
+
+func (service CommunityNoteService) Unlike(communityNoteId string, username string) error {
+	collection := service.db.Collection(db.LikeCollection)
+
+	filter := bson.M{
+		"communityNoteId": communityNoteId,
+		"username":        username,
+	}
+
+	res, err := collection.DeleteOne(service.ctx, filter)
+	if err != nil {
+		return fmt.Errorf("unlike: %w", err)
+	}
+
+	if res.DeletedCount == 0 {
+		return errors.New("like not found")
+	}
+
+	return nil
 }

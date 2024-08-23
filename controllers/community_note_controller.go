@@ -91,11 +91,37 @@ func (controller CommunityNoteController) Delete(ctx *gin.Context) {
 }
 
 func (controller CommunityNoteController) Like(ctx *gin.Context) {
+	communityNoteId := ctx.Param(constants.ParamId)
+	username := ctx.GetString(constants.CtxUsername)
 
+	like := models.Like{
+		CommunityNoteId: communityNoteId,
+		Username:        username,
+		CreatedAt:       time.Now(),
+	}
+
+	err := controller.communityNoteService.Like(like)
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response.WithSuccess(ctx, http.StatusOK, message.CommunityNoteLiked, nil)
 }
 
 func (controller CommunityNoteController) Unlike(ctx *gin.Context) {
+	communityNoteId := ctx.Param(constants.ParamId)
+	username := ctx.GetString(constants.CtxUsername)
 
+	err := controller.communityNoteService.Unlike(communityNoteId, username)
+	if err != nil {
+		log.Println(err.Error())
+		response.WithError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response.WithSuccess(ctx, http.StatusOK, message.CommunityNoteUnliked, nil)
 }
 
 func (controller CommunityNoteController) GetById(ctx *gin.Context) {
