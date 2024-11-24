@@ -14,6 +14,17 @@ A robust Go-based REST API for managing community notes and user interactions.
 - MongoDB integration
 - Docker support
 
+## 🛠 TODO
+
+- [ ] Implement pagination for all list endpoints
+- [ ] Add rate limiting for API endpoints
+- [ ] Implement caching layer with Redis
+- [ ] Add search functionality for community notes
+- [ ] Create API documentation with Swagger/OpenAPI
+- [ ] Add unit tests and integration tests
+- [ ] Implement user roles and permissions
+
+
 ## 🛠️ Tech Stack
 
 - Go 1.22.3+
