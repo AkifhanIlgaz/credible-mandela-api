@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
@@ -27,6 +28,8 @@ func (c *Config) Validate() error {
 }
 
 func Load() (Config, error) {
+	godotenv.Load()
+
 	var config Config
 
 	viper.SetConfigFile("app.env")

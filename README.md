@@ -1,10 +1,8 @@
 # Credible Mandela API
 
-A robust Go-based REST API for managing community notes and user interactions.
+A Go-based backend service for a music application that provides podcast management, user authentication, and search functionality using MongoDB.
 
-🌐 **Website**: [crediblemandela.xyz](https://www.crediblemandela.xyz/)
-
-## 🌟 Features
+## Features
 
 - User authentication and authorization
 - Community notes management (CRUD operations)
@@ -14,32 +12,43 @@ A robust Go-based REST API for managing community notes and user interactions.
 - MongoDB integration
 - Docker support
 
-## 🛠 TODO
-
-- [ ] Implement pagination for all list endpoints
-- [ ] Add rate limiting for API endpoints
-- [ ] Implement caching layer with Redis
-- [ ] Add search functionality for community notes
-- [ ] Create API documentation with Swagger/OpenAPI
-- [ ] Add unit tests and integration tests
-- [ ] Implement user roles and permissions
-
-
-## 🛠️ Tech Stack
-
-- Go 1.22.3+
-- MongoDB
-- Docker & Docker Compose
-- Gin Web Framework
-- JWT Authentication
-
-## 📋 Prerequisites
+## Prerequisites
 
 - Go 1.22.3 or higher
-- Docker and Docker Compose
 - MongoDB
+- Docker and Docker Compose
 
-## 🔄 API Endpoints
+## Installation
+
+1.  Install dependencies:
+    ```
+    go mod download
+    ```
+2.  Set up environment variables: Create a .env file in the root directory with the following variables:
+    ```
+    MONGODB_URI=mongodb://localhost:27017
+    PORT=8080
+    JWT_SECRET=your-secret-key
+    ```
+
+## Project Structure
+
+```
+credible-mandela-api/
+├── config/         # Configuration management
+├── controllers/    # Request handlers
+├── middlewares/    # Custom middleware
+├── models/         # Data models
+├── routers/        # Route definitions
+├── services/       # Business logic
+├── utils/          # Helper functions
+├── docker-compose.yaml
+├── go.mod
+├── go.sum
+└── main.go
+```
+
+## API Endpoints
 
 ### Authentication
 
@@ -67,80 +76,44 @@ A robust Go-based REST API for managing community notes and user interactions.
 - `PUT /api/ads/:id` - Update advertisement
 - `DELETE /api/ads/:id` - Delete advertisement
 
-## 🏗️ Project Structure
+## Running the Application
+
+1.  Start MongoDB:
+    ```
+    docker-compose up -d
+    ```
+2.  Run the application:
+    `    go run main.go
+   `
+    The server will start on http://localhost:8080 by default.
+
+## Example API Usage
+
+### User Registration
 
 ```
-credible-mandela-api/
-├── config/         # Configuration management
-├── controllers/    # Request handlers
-├── middlewares/    # Custom middleware
-├── models/         # Data models
-├── routers/        # Route definitions
-├── services/       # Business logic
-├── utils/          # Helper functions
-├── docker-compose.yaml
-├── go.mod
-├── go.sum
-└── main.go
+curl -X POST http://localhost:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "password123"}'
 ```
 
-## 🔒 Security Features
+### User Login
 
-- JWT-based authentication with ECDSA signing
-- Elliptic Curve Digital Signature Algorithm (ECDSA) for cryptographic operations
-- CORS configuration
-- Request validation
-- Secure environment variable management
-- Public/private key pair authentication using ECDSA P-256 curve
+```
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "password123"}'
+```
 
-## 📦 Dependencies
+### Create Community Note
 
-Key dependencies include:
+```
+curl -X POST http://localhost:8080/api/community-notes \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-jwt-token>" \
+  -d '{"title": "My Note", "content": "A great note"}'
+```
 
-- Gin Web Framework
-- MongoDB Go Driver
-- JWT Go
-- Viper
-- CORS middleware
+## License
 
-For a complete list, see `go.mod`.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 👥 Authors
-
-- Your Name (@yourusername)
-
-## 🙏 Acknowledgments
-
-- Thanks to all contributors
-- Inspired by community note-sharing platforms
-
-This README provides:
-
-- Clear installation instructions
-- API endpoint documentation
-- Project structure overview
-- Security features
-- Contributing guidelines
-- License information
-
-You may want to customize:
-
-1. The repository URL
-2. Author information
-3. License details
-4. Any specific deployment instructions for your environment
-5. Add any additional features or requirements specific to your implementation
-
-Would you like me to modify any section or add more specific details to any part?
+This project is licensed under the MIT License - see the `LICENSE` file for details.

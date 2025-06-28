@@ -15,11 +15,9 @@ import (
 	"github.com/AkifhanIlgaz/credible-mandela-api/utils/mande"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	godotenv.Load()
 	config, err := cfg.Load()
 	if err != nil {
 		log.Fatal(err)
