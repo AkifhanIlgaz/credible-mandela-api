@@ -116,31 +116,3 @@ For a complete list, see `go.mod`.
 ## 📝 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 👥 Authors
-
-- Your Name (@yourusername)
-
-## 🙏 Acknowledgments
-
-- Thanks to all contributors
-- Inspired by community note-sharing platforms
-
-This README provides:
-
-- Clear installation instructions
-- API endpoint documentation
-- Project structure overview
-- Security features
-- Contributing guidelines
-- License information
-
-You may want to customize:
-
-1. The repository URL
-2. Author information
-3. License details
-4. Any specific deployment instructions for your environment
-5. Add any additional features or requirements specific to your implementation
-
-Would you like me to modify any section or add more specific details to any part?
