@@ -1,157 +1,159 @@
 # Credible Mandela API
 
-A Go-based backend service for a music application that provides podcast management, user authentication, and search functionality using MongoDB.
+A robust Go-based REST API for managing community notes and user interactions, built with a focus on security and performance.
 
-🌐 **Website**: [crediblemandela.xyz](https://www.crediblemandela.xyz/)
+🌐 **Website**: [crediblemandela.xyz](https://tek-zeki-sensin.vercel.app/community-notes)
 
-## 🌟 Features
+## 🌟 Key Features & Technologies
 
-- User authentication and authorization
-- Community notes management (CRUD operations)
-- Like/Unlike functionality
-- User-specific note retrieval
-- Advertisement management system
-- MongoDB integration
-- Docker support
+### Core Functionality
+
+- **User Authentication**: Secure user registration and login with JWT (access and refresh tokens).
+- **Community Notes**: Full CRUD (Create, Read, Update, Delete) operations for community-driven notes.
+- **Engagement**: Like and Unlike functionality for notes.
+- **Advertisement System**: Manage and display advertisements within the platform.
+
+### Technical Stack
+
+- **Language**: **Go (Golang)**
+- **Framework**: **Gin Web Framework** for high-performance routing and middleware.
+- **Database**: **MongoDB** with the official Go driver for flexible, scalable data storage.
+- **Containerization**: **Docker** and **Docker Compose** for consistent development and deployment environments.
+- **Configuration**: **Viper** for managing application configuration from environment variables and files.
+- **Authentication**: **JWT (JSON Web Tokens)** with **RSA (RS256)** signing for secure, stateless authentication.
+
+### Security
+
+- **Asymmetric-Key Cryptography**: Uses **RSA keys** for signing and verifying JWTs, ensuring token integrity.
+- **Password Hashing**: Employs **bcrypt** for securely hashing and storing user passwords.
+- **CORS**: Configured Cross-Origin Resource Sharing (CORS) to control access from different domains.
+- **Input Validation**: Validates incoming request data to prevent common vulnerabilities.
+
+## 🏗️ Project Structure
+
+The project follows a clean, modular architecture to separate concerns and improve maintainability.
+
+```
+credible-mandela-api/
+├── config/         # Configuration management (Viper)
+├── controllers/    # HTTP request handlers (Gin)
+├── middlewares/    # Custom middleware (e.g., authentication)
+├── models/         # Data structures and database models
+├── routers/        # API route definitions
+├── services/       # Core business logic
+├── utils/          # Utility functions (crypto, database, etc.)
+├── docker-compose.yaml # Docker Compose configuration
+├── go.mod          # Go module dependencies
+└── main.go         # Application entry point
+```
 
 ## Prerequisites
 
 - Go 1.22.3 or higher
-- MongoDB
 - Docker and Docker Compose
+- MongoDB
 
-## Installation
+## 🚀 Getting Started
 
-1.  Install dependencies:
+### Installation
+
+1.  **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/your-username/credible-mandela-api.git
+    cd credible-mandela-api
     ```
-    go mod download
+
+2.  **Install dependencies:**
+
+    ```bash
+    go mod tidy
     ```
-2.  Set up environment variables: Create a .env file in the root directory with the following variables:
-    ```
-    MONGODB_URI=mongodb://localhost:27017
+
+3.  **Set up environment variables:**
+    Create a `.env` file in the root directory and add the following:
+
+    ```env
+    MONGO_URI=mongodb://localhost:27017
     PORT=8080
-    JWT_SECRET=your-secret-key
+
+    ACCESS_TOKEN_PRIVATE_KEY="your_base64_encoded_private_key"
+    ACCESS_TOKEN_PUBLIC_KEY="your_base64_encoded_public_key"
+    REFRESH_TOKEN_PRIVATE_KEY="your_base64_encoded_private_key"
+    REFRESH_TOKEN_PUBLIC_KEY="your_base64_encoded_public_key"
     ```
 
-## Project Structure
+### Running the Application
 
-```
-credible-mandela-api/
-├── config/         # Configuration management
-├── controllers/    # Request handlers
-├── middlewares/    # Custom middleware
-├── models/         # Data models
-├── routers/        # Route definitions
-├── services/       # Business logic
-├── utils/          # Helper functions
-├── docker-compose.yaml
-├── go.mod
-├── go.sum
-└── main.go
-```
+1.  **Start the database:**
 
-## API Endpoints
+    ```bash
+    docker-compose up -d
+    ```
+
+2.  **Run the Go server:**
+    ```bash
+    go run main.go
+    ```
+    The API will be available at `http://localhost:8080`.
+
+## 🔄 API Endpoints
 
 ### Authentication
 
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
+- `POST /api/auth/register` - Register a new user.
+- `POST /api/auth/login` - Log in and receive JWTs.
+- `POST /api/auth/refresh` - Refresh an expired access token.
 
 ### Community Notes
 
-- `GET /api/community-notes` - Get all community notes
-- `GET /api/community-notes/:id` - Get specific community note
-- `POST /api/community-notes` - Create new community note
-- `DELETE /api/community-notes/:id` - Delete community note
-- `POST /api/community-notes/like/:id` - Like a community note
-- `POST /api/community-notes/unlike/:id` - Unlike a community note
-- `GET /api/community-notes/user/:username` - Get user's community notes
-- `GET /api/community-notes/user/me` - Get current user's notes
+- `GET /api/community-notes` - Get all notes.
+- `POST /api/community-notes` - Create a new note (requires auth).
+- `DELETE /api/community-notes/:id` - Delete a note (requires auth).
+- `POST /api/community-notes/like/:id` - Like a note (requires auth).
 
 ### Advertisements
 
-- `GET /api/ads` - Get all advertisements
-- `GET /api/ads/:id` - Get specific advertisement by ID
-- `GET /api/ads/user/:address` - Get all advertisements by user address
-- `GET /api/ads/user/me` - Get current user's advertisements
-- `POST /api/ads` - Publish new advertisement
-- `PUT /api/ads/:id` - Update advertisement
-- `DELETE /api/ads/:id` - Delete advertisement
+- `GET /api/ads` - Get all advertisements.
+- `POST /api/ads` - Create a new advertisement (requires auth).
 
-## 🏗️ Project Structure
+## 💡 Example API Usage
 
-```
-credible-mandela-api/
-├── config/         # Configuration management
-├── controllers/    # Request handlers
-├── middlewares/    # Custom middleware
-├── models/         # Data models
-├── routers/        # Route definitions
-├── services/       # Business logic
-├── utils/          # Helper functions
-├── docker-compose.yaml
-├── go.mod
-├── go.sum
-└── main.go
+### User Registration
+
+```bash
+curl -X POST http://localhost:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "testuser",
+    "password": "password123",
+    "address": "0xYourEthereumAddress"
+  }'
 ```
 
-## 🔒 Security Features
+### User Login
 
-- JWT-based authentication with ECDSA signing
-- Elliptic Curve Digital Signature Algorithm (ECDSA) for cryptographic operations
-- CORS configuration
-- Request validation
-- Secure environment variable management
-- Public/private key pair authentication using ECDSA P-256 curve
+```bash
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "testuser",
+    "password": "password123"
+  }'
+```
 
-## 📦 Dependencies
+### Create a Community Note (Authentication Required)
 
-Key dependencies include:
+First, log in to get an access token. Then, use the token in the Authorization header.
 
-- Gin Web Framework
-- MongoDB Go Driver
-- JWT Go
-- Viper
-- CORS middleware
-
-For a complete list, see `go.mod`.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 👥 Authors
-
-- Your Name (@yourusername)
-
-## 🙏 Acknowledgments
-
-- Thanks to all contributors
-- Inspired by community note-sharing platforms
-
-This README provides:
-
-- Clear installation instructions
-- API endpoint documentation
-- Project structure overview
-- Security features
-- Contributing guidelines
-- License information
-
-You may want to customize:
-
-1. The repository URL
-2. Author information
-3. License details
-4. Any specific deployment instructions for your environment
-5. Add any additional features or requirements specific to your implementation
-
-Would you like me to modify any section or add more specific details to any part?
+```bash
+# Replace <your-jwt-token> with the actual access token from the login response
+curl -X POST http://localhost:8080/api/community-notes \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-jwt-token>" \
+  -d '{
+    "title": "My First Note",
+    "content": "This is a sample community note.",
+    "url": "http://example.com"
+  }'
+```
